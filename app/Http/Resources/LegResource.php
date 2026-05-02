@@ -16,7 +16,7 @@ class LegResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'legIndex' => $this->legSnapshot->getLegIndex(),
+            'legIndex' => $this->legSnapshot->getLegType()->value,
             'segments' => SegmentResource::collection($this->legSnapshot->getSegments()),
         ];
     }

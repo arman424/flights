@@ -9,6 +9,7 @@ use App\DTO\Flight\CreateLegDTO;
 use App\DTO\Flight\UpdateFlightDTO;
 use App\DTO\Flight\UpdateLegDTO;
 use App\Enums\FlightStatus;
+use App\Enums\LegType;
 use DateMalformedStringException;
 use DomainException;
 
@@ -33,8 +34,14 @@ final class Flight
             throw new DomainException('A flight must have at least one leg.');
         }
 
+        $legCases = LegType::cases();
+
+        if (count($createFlightDTO->getLegs()) > count($legCases)) {
+            throw new DomainException('A flight cannot have more than ' . count($legCases) . ' legs.');
+        }
+
         $legs = array_map(
-            fn(CreateLegDTO $legDTO, int $index) => Leg::create($index, $legDTO),
+            fn(CreateLegDTO $legDTO, int $index) => Leg::create($legCases[$index], $legDTO),
             $createFlightDTO->getLegs(),
             array_keys($createFlightDTO->getLegs()),
         );
@@ -60,8 +67,10 @@ final class Flight
             throw new DomainException('At least one leg must be provided for an update.');
         }
 
+        $legCases = LegType::cases();
+
         $this->legs = array_map(
-            fn(UpdateLegDTO $legDTO, int $index) => Leg::fromUpdate($index, $legDTO),
+            fn(UpdateLegDTO $legDTO, int $index) => Leg::fromUpdate($legCases[$index], $legDTO),
             $updateFlightDTO->getLegs(),
             array_keys($updateFlightDTO->getLegs()),
         );

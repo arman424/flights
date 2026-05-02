@@ -21,8 +21,7 @@ return new class extends Migration
                 ->references('code')
                 ->on('airlines');
 
-            $table->unique(['airline_code', 'flight_number']);
-            $table->index('aircraft_type');
+            $table->index(['airline_code', 'flight_number']);
         });
     }
 

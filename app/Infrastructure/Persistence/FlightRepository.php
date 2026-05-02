@@ -80,7 +80,7 @@ readonly class FlightRepository implements FlightRepositoryContract
         foreach ($legSnapshots as $legSnapshot) {
             $legModel = $flightModel->legs()->create([
                 'id'        => $this->uuidGenerator->generate(),
-                'leg_index' => $legSnapshot->getLegIndex(),
+                'leg_index' => $legSnapshot->getLegType()->value,
             ]);
 
             $segments = [];
@@ -106,7 +106,7 @@ readonly class FlightRepository implements FlightRepositoryContract
     private function updateLeg(FlightModel $flightModel, LegSnapshot $legSnapshot): void
     {
         $legModel = $flightModel->legs()
-            ->where('leg_index', $legSnapshot->getLegIndex())
+            ->where('leg_index', $legSnapshot->getLegType()->value)
             ->firstOrFail();
 
         foreach ($legSnapshot->getSegments() as $segmentSnapshot) {

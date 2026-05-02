@@ -11,7 +11,7 @@ return new class extends Migration
     {
         Schema::create('flights', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->enum('status', FlightStatus::values())->default(FlightStatus::Scheduled->value);
+            $table->enum('status', FlightStatus::values())->default(FlightStatus::Scheduled->value)->index();
             $table->timestamps();
             $table->softDeletes();
         });

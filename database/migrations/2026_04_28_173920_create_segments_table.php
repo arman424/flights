@@ -42,6 +42,7 @@ return new class extends Migration
             $table->index('origin');
             $table->index('destination');
             $table->index('departure');
+            $table->index('arrival');
         });
     }
 

@@ -7,6 +7,7 @@ use App\DTO\Flight\CreateLegDTO;
 use App\DTO\Flight\CreateSegmentDTO;
 use App\DTO\Flight\UpdateLegDTO;
 use App\DTO\Flight\UpdateSegmentDTO;
+use App\Enums\LegType;
 use DateMalformedStringException;
 use DomainException;
 
@@ -16,18 +17,18 @@ use DomainException;
 final class Leg
 {
     private function __construct(
-        private int   $legIndex,
-        private array $segments,
+        private LegType $legIndex,
+        private array    $segments,
     ) {}
 
     /**
      * @throws DomainException
      * @throws DateMalformedStringException
      */
-    public static function create(int $legIndex, CreateLegDTO $createLegDTO): self
+    public static function create(LegType $legIndex, CreateLegDTO $createLegDTO): self
     {
         if (empty($createLegDTO->getSegments())) {
-            throw new DomainException("Leg $legIndex must have at least one segment.");
+            throw new DomainException("Leg $legIndex->name must have at least one segment.");
         }
 
         $segments = array_map(
@@ -43,10 +44,10 @@ final class Leg
      * @throws DomainException
      * @throws DateMalformedStringException
      */
-    public static function fromUpdate(int $legIndex, UpdateLegDTO $updateLegDTO): self
+    public static function fromUpdate(LegType $legIndex, UpdateLegDTO $updateLegDTO): self
     {
         if (empty($updateLegDTO->getSegments())) {
-            throw new DomainException("Leg $legIndex must have at least one segment.");
+            throw new DomainException("Leg $legIndex->name must have at least one segment.");
         }
 
         $segments = array_map(
@@ -61,7 +62,7 @@ final class Leg
     /**
      * @param Segment[] $segments
      */
-    public static function rehydrate(int $legIndex, array $segments): self
+    public static function rehydrate(LegType $legIndex, array $segments): self
     {
         return new self(legIndex: $legIndex, segments: $segments);
     }

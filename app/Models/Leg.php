@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\LegType;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,10 @@ class Leg extends Model
     use HasUuids, SoftDeletes;
 
     protected $fillable = ['flight_id', 'leg_index'];
+
+    protected $casts = [
+        'leg_index' => LegType::class,
+    ];
 
     public function flight(): BelongsTo
     {
