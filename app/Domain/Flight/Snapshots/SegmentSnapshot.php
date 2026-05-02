@@ -2,6 +2,7 @@
 
 namespace App\Domain\Flight\Snapshots;
 
+use App\Enums\CabinClassCode;
 use DateTimeImmutable;
 
 final readonly class SegmentSnapshot
@@ -12,17 +13,17 @@ final readonly class SegmentSnapshot
         private string            $destination,
         private DateTimeImmutable $departure,
         private DateTimeImmutable $arrival,
-        private string            $cabinClass,
+        private CabinClassCode    $cabinClass,
         private string            $airlineCode,
         private string            $flightNumber,
     ) {}
 
-    public function getSegmentIndex(): int { return $this->segmentIndex; }
-    public function getOrigin(): string { return $this->origin; }
-    public function getDestination(): string { return $this->destination; }
+    public function getSegmentIndex(): int            { return $this->segmentIndex; }
+    public function getOrigin(): string               { return $this->origin; }
+    public function getDestination(): string          { return $this->destination; }
     public function getDeparture(): DateTimeImmutable { return $this->departure; }
-    public function getArrival(): DateTimeImmutable { return $this->arrival; }
-    public function getCabinClass(): string { return $this->cabinClass; }
-    public function getAirlineCode(): string { return $this->airlineCode; }
-    public function getFlightNumber(): string { return $this->flightNumber; }
+    public function getArrival(): DateTimeImmutable   { return $this->arrival; }
+    public function getCabinClass(): CabinClassCode   { return $this->cabinClass; }
+    public function getAirlineCode(): string          { return $this->airlineCode; }
+    public function getFlightNumber(): string         { return $this->flightNumber; }
 }

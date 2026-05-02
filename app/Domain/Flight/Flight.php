@@ -2,9 +2,12 @@
 
 namespace App\Domain\Flight;
 
+use App\Domain\Contracts\UuidGeneratorInterface;
 use App\Domain\Flight\Snapshots\FlightSnapshot;
-use App\DTO\CreateFlightDTO;
-use App\DTO\CreateLegDTO;
+use App\DTO\Flight\CreateFlightDTO;
+use App\DTO\Flight\CreateLegDTO;
+use App\DTO\Flight\UpdateFlightDTO;
+use App\DTO\Flight\UpdateLegDTO;
 use App\Enums\FlightStatus;
 use DateMalformedStringException;
 use DomainException;
@@ -12,39 +15,69 @@ use DomainException;
 /**
  * Flight Aggregate Root.
  */
-final readonly class Flight
+final class Flight
 {
-    private function __construct(private array $legs) {}
+    private function __construct(
+        private string       $id,
+        private FlightStatus $status,
+        private array        $legs,
+    ) {}
 
     /**
-     * The only entry point for creating a Flight.
-     *
      * @throws DomainException
      * @throws DateMalformedStringException
      */
-    public static function create(CreateFlightDTO $createFlightDTO): self
+    public static function create(CreateFlightDTO $createFlightDTO, UuidGeneratorInterface $uuidGenerator): self
     {
         if (empty($createFlightDTO->getLegs())) {
             throw new DomainException('A flight must have at least one leg.');
         }
 
         $legs = array_map(
-            fn(CreateLegDTO $legDTO, int $legIndex) => Leg::create($legIndex, $legDTO),
+            fn(CreateLegDTO $legDTO, int $index) => Leg::create($index, $legDTO),
             $createFlightDTO->getLegs(),
             array_keys($createFlightDTO->getLegs()),
         );
 
-        return new self(legs: $legs);
+        return new self(id: $uuidGenerator->generate(), status: FlightStatus::Scheduled, legs: $legs);
     }
 
     /**
-     * Returns a complete, immutable snapshot of the aggregate's state.
+     * @param Leg[] $legs
      */
+    public static function rehydrate(string $id, FlightStatus $status, array $legs): self
+    {
+        return new self(id: $id, status: $status, legs: $legs);
+    }
+
+    /**
+     * @throws DomainException
+     * @throws DateMalformedStringException
+     */
+    public function updateFromDTO(UpdateFlightDTO $updateFlightDTO): void
+    {
+        if (empty($updateFlightDTO->getLegs())) {
+            throw new DomainException('At least one leg must be provided for an update.');
+        }
+
+        $this->legs = array_map(
+            fn(UpdateLegDTO $legDTO, int $index) => Leg::fromUpdate($index, $legDTO),
+            $updateFlightDTO->getLegs(),
+            array_keys($updateFlightDTO->getLegs()),
+        );
+    }
+
     public function snapshot(): FlightSnapshot
     {
         return new FlightSnapshot(
-            status: FlightStatus::Scheduled,
+            id:     $this->id,
+            status: $this->status,
             legs:   array_map(fn(Leg $leg) => $leg->toSnapshot(), $this->legs),
         );
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
     }
 }

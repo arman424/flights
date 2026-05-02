@@ -17,8 +17,8 @@ return new class extends Migration
             $table->unsignedInteger('segment_index'); // Position within the leg
             $table->string('origin', 3);              // IATA airport code
             $table->string('destination', 3);         // IATA airport code
-            $table->dateTime('departure');
-            $table->dateTime('arrival');
+            $table->dateTimeTz('departure');
+            $table->dateTimeTz('arrival');
             $table->string('cabin_class');
             $table->string('airline_code');
             $table->string('flight_number');

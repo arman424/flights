@@ -3,18 +3,22 @@
 namespace App\Domain\Flight;
 
 use App\Domain\Flight\Snapshots\LegSnapshot;
-use App\DTO\CreateLegDTO;
-use App\DTO\CreateSegmentDTO;
+use App\DTO\Flight\CreateLegDTO;
+use App\DTO\Flight\CreateSegmentDTO;
+use App\DTO\Flight\UpdateLegDTO;
+use App\DTO\Flight\UpdateSegmentDTO;
 use DateMalformedStringException;
 use DomainException;
 
 /**
  * Leg entity, owned by the Flight aggregate.
- * State is only accessible through the aggregate's snapshot() method.
  */
-final readonly class Leg
+final class Leg
 {
-    private function __construct(private int $legIndex, private array $segments) {}
+    private function __construct(
+        private int   $legIndex,
+        private array $segments,
+    ) {}
 
     /**
      * @throws DomainException
@@ -32,10 +36,34 @@ final readonly class Leg
             array_keys($createLegDTO->getSegments()),
         );
 
-        return new self(
-            legIndex: $legIndex,
-            segments: $segments,
+        return new self(legIndex: $legIndex, segments: $segments);
+    }
+
+    /**
+     * @throws DomainException
+     * @throws DateMalformedStringException
+     */
+    public static function fromUpdate(int $legIndex, UpdateLegDTO $updateLegDTO): self
+    {
+        if (empty($updateLegDTO->getSegments())) {
+            throw new DomainException("Leg $legIndex must have at least one segment.");
+        }
+
+        $segments = array_map(
+            fn(UpdateSegmentDTO $segmentDTO, int $segmentIndex) => Segment::fromUpdate($segmentIndex, $segmentDTO),
+            $updateLegDTO->getSegments(),
+            array_keys($updateLegDTO->getSegments()),
         );
+
+        return new self(legIndex: $legIndex, segments: $segments);
+    }
+
+    /**
+     * @param Segment[] $segments
+     */
+    public static function rehydrate(int $legIndex, array $segments): self
+    {
+        return new self(legIndex: $legIndex, segments: $segments);
     }
 
     /** @internal called by Flight::snapshot() */

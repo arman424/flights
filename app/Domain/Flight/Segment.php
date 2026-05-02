@@ -3,36 +3,37 @@
 namespace App\Domain\Flight;
 
 use App\Domain\Flight\Snapshots\SegmentSnapshot;
-use App\DTO\CreateSegmentDTO;
+use App\DTO\Flight\CreateSegmentDTO;
+use App\DTO\Flight\UpdateSegmentDTO;
+use App\Enums\CabinClassCode;
 use DateMalformedStringException;
 use DateTimeImmutable;
 use DomainException;
 
 /**
  * Segment entity, owned by the Leg (and transitively by the Flight aggregate).
- * State is only accessible through the aggregate's snapshot() method.
  */
-final readonly class Segment
+final class Segment
 {
     private function __construct(
-        private int              $segmentIndex,
-        private string           $origin,
-        private string           $destination,
+        private int               $segmentIndex,
+        private string            $origin,
+        private string            $destination,
         private DateTimeImmutable $departure,
         private DateTimeImmutable $arrival,
-        private string           $cabinClass,
-        private string           $airlineCode,
-        private string           $flightNumber,
+        private CabinClassCode    $cabinClass,
+        private string            $airlineCode,
+        private string            $flightNumber,
     ) {}
 
     /**
      * @throws DomainException
      * @throws DateMalformedStringException
      */
-    public static function create(int $segmentIndex, CreateSegmentDTO $dto): self
+    public static function create(int $segmentIndex, CreateSegmentDTO $createSegmentDTO): self
     {
-        $departure = new DateTimeImmutable($dto->getDeparture());
-        $arrival   = new DateTimeImmutable($dto->getArrival());
+        $departure = new DateTimeImmutable($createSegmentDTO->getDeparture());
+        $arrival   = new DateTimeImmutable($createSegmentDTO->getArrival());
 
         if ($arrival <= $departure) {
             throw new DomainException('Segment arrival must be after departure.');
@@ -40,13 +41,65 @@ final readonly class Segment
 
         return new self(
             segmentIndex:  $segmentIndex,
-            origin:        strtoupper($dto->getOrigin()),
-            destination:   strtoupper($dto->getDestination()),
+            origin:        strtoupper($createSegmentDTO->getOrigin()),
+            destination:   strtoupper($createSegmentDTO->getDestination()),
             departure:     $departure,
             arrival:       $arrival,
-            cabinClass:    strtoupper($dto->getCabinClass()),
-            airlineCode:   strtoupper($dto->getAirlineCode()),
-            flightNumber:  $dto->getFlightNumber(),
+            cabinClass:    CabinClassCode::tryFrom($createSegmentDTO->getCabinClass()),
+            airlineCode:   strtoupper($createSegmentDTO->getAirlineCode()),
+            flightNumber:  $createSegmentDTO->getFlightNumber(),
+        );
+    }
+
+    /**
+     * Create Segment from update DTO
+     *
+     * @throws DomainException
+     * @throws DateMalformedStringException
+     */
+    public static function fromUpdate(int $segmentIndex, UpdateSegmentDTO $updateSegmentDTO): self
+    {
+        $departure = new DateTimeImmutable($updateSegmentDTO->getDeparture());
+        $arrival   = new DateTimeImmutable($updateSegmentDTO->getArrival());
+
+        if ($arrival <= $departure) {
+            throw new DomainException('Segment arrival must be after departure.');
+        }
+
+        return new self(
+            segmentIndex:  $segmentIndex,
+            origin:        strtoupper($updateSegmentDTO->getOrigin()),
+            destination:   strtoupper($updateSegmentDTO->getDestination()),
+            departure:     $departure,
+            arrival:       $arrival,
+            cabinClass:    CabinClassCode::tryFrom($updateSegmentDTO->getCabinClass()),
+            airlineCode:   strtoupper($updateSegmentDTO->getAirlineCode()),
+            flightNumber:  $updateSegmentDTO->getFlightNumber(),
+        );
+    }
+
+    /**
+     * Rehydrate Segment from DB.
+     */
+    public static function rehydrate(
+        int               $segmentIndex,
+        string            $origin,
+        string            $destination,
+        DateTimeImmutable $departure,
+        DateTimeImmutable $arrival,
+        CabinClassCode    $cabinClass,
+        string            $airlineCode,
+        string            $flightNumber,
+    ): self {
+        return new self(
+            segmentIndex:  $segmentIndex,
+            origin:        $origin,
+            destination:   $destination,
+            departure:     $departure,
+            arrival:       $arrival,
+            cabinClass:    $cabinClass,
+            airlineCode:   $airlineCode,
+            flightNumber:  $flightNumber,
         );
     }
 

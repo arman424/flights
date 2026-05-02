@@ -2,20 +2,22 @@
 
 namespace App\Providers;
 
+use App\Domain\Contracts\UuidGeneratorInterface;
 use App\Domain\Flight\Contracts\FlightRepositoryContract;
 use App\Infrastructure\Persistence\FlightRepository;
+use App\Infrastructure\UuidGenerator;
+use App\Services\Contracts\IdempotencyGuardContract;
+use App\Services\IdempotencyGuard;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Horizon\Horizon;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-        // Bind the domain interface to the Eloquent implementation.
-        // Swap this binding (e.g. in tests) without touching any domain or application code.
         $this->app->bind(FlightRepositoryContract::class, FlightRepository::class);
+        $this->app->bind(UuidGeneratorInterface::class, UuidGenerator::class);
+        $this->app->bind(IdempotencyGuardContract::class, IdempotencyGuard::class);
     }
 
     /**
@@ -23,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Horizon::auth(function ($request) {
+            return app()->environment('local');
+        });
     }
 }

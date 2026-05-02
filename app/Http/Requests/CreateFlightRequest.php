@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\DTO\CreateFlightDTO;
+use App\DTO\Flight\CreateFlightDTO;
 use App\Enums\CabinClassCode;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;

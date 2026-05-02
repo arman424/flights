@@ -1,8 +1,8 @@
 <?php
 
-namespace App\DTO;
+namespace App\DTO\Flight;
 
-final readonly class CreateSegmentDTO
+final readonly class UpdateSegmentDTO
 {
     public function __construct(
         private string $origin,
@@ -14,12 +14,12 @@ final readonly class CreateSegmentDTO
         private string $flightNumber,
     ) {}
 
-    public function getOrigin(): string { return $this->origin; }
-    public function getDestination(): string { return $this->destination; }
-    public function getDeparture(): string { return $this->departure; }
-    public function getArrival(): string { return $this->arrival; }
-    public function getCabinClass(): string { return $this->cabinClass; }
-    public function getAirlineCode(): string { return $this->airlineCode; }
+    public function getOrigin(): string       { return $this->origin; }
+    public function getDestination(): string  { return $this->destination; }
+    public function getDeparture(): string    { return $this->departure; }
+    public function getArrival(): string      { return $this->arrival; }
+    public function getCabinClass(): string   { return $this->cabinClass; }
+    public function getAirlineCode(): string  { return $this->airlineCode; }
     public function getFlightNumber(): string { return $this->flightNumber; }
 
     public static function fromArray(array $segment): self
@@ -35,3 +35,4 @@ final readonly class CreateSegmentDTO
         );
     }
 }
+

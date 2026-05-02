@@ -1,15 +1,13 @@
 <?php
 
-namespace App\DTO;
+namespace App\DTO\Flight;
 
 final readonly class CreateFlightDTO
 {
     /**
      * @param CreateLegDTO[] $legs
      */
-    public function __construct(
-        private array $legs,
-    ) {}
+    public function __construct(private array $legs) {}
 
     /** @return CreateLegDTO[] */
     public function getLegs(): array { return $this->legs; }
@@ -24,3 +22,4 @@ final readonly class CreateFlightDTO
         );
     }
 }
+
