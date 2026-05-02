@@ -10,11 +10,11 @@ final readonly class LegSnapshot
      * @param SegmentSnapshot[] $segments
      */
     public function __construct(
-        private LegType $legIndex,
-        private array    $segments,
+        private LegType $legType,
+        private array   $segments,
     ) {}
 
-    public function getLegType(): LegType { return $this->legIndex; }
+    public function getLegType(): LegType { return $this->legType; }
 
     /** @return SegmentSnapshot[] */
     public function getSegments(): array { return $this->segments; }

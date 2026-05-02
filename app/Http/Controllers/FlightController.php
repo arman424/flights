@@ -23,7 +23,7 @@ class FlightController extends Controller
     {
         $flight = $this->getFlightService->execute($flightId);
 
-        return new FlightResource($flight->snapshot());
+        return new FlightResource($flight->toSnapshot());
     }
 
     public function store(CreateFlightRequest $request): JsonResponse

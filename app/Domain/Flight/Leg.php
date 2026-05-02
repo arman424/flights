@@ -17,18 +17,18 @@ use DomainException;
 final class Leg
 {
     private function __construct(
-        private LegType $legIndex,
-        private array    $segments,
+        private LegType $legType,
+        private array   $segments,
     ) {}
 
     /**
      * @throws DomainException
      * @throws DateMalformedStringException
      */
-    public static function create(LegType $legIndex, CreateLegDTO $createLegDTO): self
+    public static function create(LegType $legType, CreateLegDTO $createLegDTO): self
     {
         if (empty($createLegDTO->getSegments())) {
-            throw new DomainException("Leg $legIndex->name must have at least one segment.");
+            throw new DomainException("Leg $legType->name must have at least one segment.");
         }
 
         $segments = array_map(
@@ -37,41 +37,41 @@ final class Leg
             array_keys($createLegDTO->getSegments()),
         );
 
-        return new self(legIndex: $legIndex, segments: $segments);
+        return new self(legType: $legType, segments: $segments);
     }
 
     /**
      * @throws DomainException
      * @throws DateMalformedStringException
      */
-    public static function fromUpdate(LegType $legIndex, UpdateLegDTO $updateLegDTO): self
+    public static function update(LegType $legType, UpdateLegDTO $updateLegDTO): self
     {
         if (empty($updateLegDTO->getSegments())) {
-            throw new DomainException("Leg $legIndex->name must have at least one segment.");
+            throw new DomainException("Leg $legType->name must have at least one segment.");
         }
 
         $segments = array_map(
-            fn(UpdateSegmentDTO $segmentDTO, int $segmentIndex) => Segment::fromUpdate($segmentIndex, $segmentDTO),
+            fn(UpdateSegmentDTO $segmentDTO, int $segmentIndex) => Segment::update($segmentIndex, $segmentDTO),
             $updateLegDTO->getSegments(),
             array_keys($updateLegDTO->getSegments()),
         );
 
-        return new self(legIndex: $legIndex, segments: $segments);
+        return new self(legType: $legType, segments: $segments);
     }
 
     /**
      * @param Segment[] $segments
      */
-    public static function rehydrate(LegType $legIndex, array $segments): self
+    public static function rehydrate(LegType $legType, array $segments): self
     {
-        return new self(legIndex: $legIndex, segments: $segments);
+        return new self(legType: $legType, segments: $segments);
     }
 
-    /** @internal called by Flight::snapshot() */
+    /** @internal called by Flight::toSnapshot() */
     public function toSnapshot(): LegSnapshot
     {
         return new LegSnapshot(
-            legIndex: $this->legIndex,
+            legType: $this->legType,
             segments: array_map(fn(Segment $segment) => $segment->toSnapshot(), $this->segments),
         );
     }

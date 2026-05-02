@@ -9,9 +9,6 @@ use App\DTO\Flight\CreateFlightDTO;
 use DateMalformedStringException;
 use DomainException;
 
-/**
- * Application service – orchestrates the "create a flight" use case.
- */
 final readonly class CreateFlightService
 {
     public function __construct(

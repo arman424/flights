@@ -50,18 +50,10 @@ final class Flight
     }
 
     /**
-     * @param Leg[] $legs
-     */
-    public static function rehydrate(string $id, FlightStatus $status, array $legs): self
-    {
-        return new self(id: $id, status: $status, legs: $legs);
-    }
-
-    /**
      * @throws DomainException
      * @throws DateMalformedStringException
      */
-    public function updateFromDTO(UpdateFlightDTO $updateFlightDTO): void
+    public function update(UpdateFlightDTO $updateFlightDTO): void
     {
         if (empty($updateFlightDTO->getLegs())) {
             throw new DomainException('At least one leg must be provided for an update.');
@@ -70,23 +62,31 @@ final class Flight
         $legCases = LegType::cases();
 
         $this->legs = array_map(
-            fn(UpdateLegDTO $legDTO, int $index) => Leg::fromUpdate($legCases[$index], $legDTO),
+            fn(UpdateLegDTO $legDTO, int $index) => Leg::update($legCases[$index], $legDTO),
             $updateFlightDTO->getLegs(),
             array_keys($updateFlightDTO->getLegs()),
-        );
-    }
-
-    public function snapshot(): FlightSnapshot
-    {
-        return new FlightSnapshot(
-            id:     $this->id,
-            status: $this->status,
-            legs:   array_map(fn(Leg $leg) => $leg->toSnapshot(), $this->legs),
         );
     }
 
     public function getId(): string
     {
         return $this->id;
+    }
+
+    /**
+     * @param Leg[] $legs
+     */
+    public static function rehydrate(string $id, FlightStatus $status, array $legs): self
+    {
+        return new self(id: $id, status: $status, legs: $legs);
+    }
+
+    public function toSnapshot(): FlightSnapshot
+    {
+        return new FlightSnapshot(
+            id:     $this->id,
+            status: $this->status,
+            legs:   array_map(fn(Leg $leg) => $leg->toSnapshot(), $this->legs),
+        );
     }
 }

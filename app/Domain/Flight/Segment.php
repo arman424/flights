@@ -57,7 +57,7 @@ final class Segment
      * @throws DomainException
      * @throws DateMalformedStringException
      */
-    public static function fromUpdate(int $segmentIndex, UpdateSegmentDTO $updateSegmentDTO): self
+    public static function update(int $segmentIndex, UpdateSegmentDTO $updateSegmentDTO): self
     {
         $departure = new DateTimeImmutable($updateSegmentDTO->getDeparture());
         $arrival   = new DateTimeImmutable($updateSegmentDTO->getArrival());

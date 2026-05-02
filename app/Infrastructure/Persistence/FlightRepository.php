@@ -39,34 +39,34 @@ readonly class FlightRepository implements FlightRepositoryContract
 
     public function save(FlightAggregate $flight): string
     {
-        $snapshot = $flight->snapshot();
+        $flightSnapshot = $flight->toSnapshot();
 
-        return DB::transaction(function () use ($snapshot): string {
+        return DB::transaction(function () use ($flightSnapshot): string {
             $flightModel = FlightModel::create([
-                'id'     => $snapshot->getId(),
-                'status' => $snapshot->getStatus()->value,
+                'id'     => $flightSnapshot->getId(),
+                'status' => $flightSnapshot->getStatus()->value,
             ]);
 
-            $this->bulkInsertLegs($flightModel, $snapshot->getLegs());
+            $this->bulkInsertLegs($flightModel, $flightSnapshot->getLegs());
 
-            return $snapshot->getId();
+            return $flightSnapshot->getId();
         });
     }
 
     public function update(FlightAggregate $flight): void
     {
-        $snapshot = $flight->snapshot();
+        $flightSnapshot = $flight->toSnapshot();
 
-        DB::transaction(function () use ($snapshot): void {
+        DB::transaction(function () use ($flightSnapshot): void {
 
-            $flightModel = FlightModel::where('id', $snapshot->getId())
+            $flightModel = FlightModel::where('id', $flightSnapshot->getId())
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $flightModel->status = $snapshot->getStatus()->value;
+            $flightModel->status = $flightSnapshot->getStatus()->value;
             $flightModel->save();
 
-            foreach ($snapshot->getLegs() as $legSnapshot) {
+            foreach ($flightSnapshot->getLegs() as $legSnapshot) {
                 $this->updateLeg($flightModel, $legSnapshot);
             }
         });

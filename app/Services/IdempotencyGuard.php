@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Cache;
 
 final class IdempotencyGuard implements IdempotencyGuardContract
 {
-    private const TTL_HOURS = 24;
+    private const int TTL_HOURS = 24;
 
     public function reserve(string $key): bool
     {

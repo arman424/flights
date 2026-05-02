@@ -12,8 +12,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final readonly class ScheduleFlightUpdateService
 {
     public function __construct(
-        private IdempotencyGuardContract   $idempotencyGuard,
-        private FlightRepositoryContract   $flightRepository,
+        private IdempotencyGuardContract $idempotencyGuard,
+        private FlightRepositoryContract $flightRepository,
     ) {}
 
     public function execute(string $idempotencyKey, UpdateFlightDTO $updateFlightDTO): void

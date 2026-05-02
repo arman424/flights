@@ -21,7 +21,7 @@ final readonly class UpdateFlightService
     {
         $flight = $this->flightRepository->get($updateFlightDTO->getFlightId());
 
-        $flight->updateFromDTO($updateFlightDTO);
+        $flight->update($updateFlightDTO);
 
         // TODO: Consider applying the Transactional Outbox Pattern
         // by dispatching a FlightUpdated event inside the same transaction

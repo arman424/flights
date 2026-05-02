@@ -14,10 +14,6 @@ class UpdateFlightRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Merge the Idempotency-Key header into the data bag so it can be validated
-     * alongside the body fields.
-     */
     protected function prepareForValidation(): void
     {
         $this->merge([
